@@ -1,0 +1,55 @@
+{
+  "storage": [
+    {
+      "astId": 11,
+      "contract": "src/slots.sol:slots",
+      "label": "slot_1",
+      "offset": 0,
+      "slot": "0",
+      "type": "t_struct(slot1)8_storage"
+    }
+  ],
+  "types": {
+    "t_bool": {
+      "encoding": "inplace",
+      "label": "bool",
+      "numberOfBytes": "1"
+    },
+    "t_struct(slot1)8_storage": {
+      "encoding": "inplace",
+      "label": "struct slots.slot1",
+      "numberOfBytes": "32",
+      "members": [
+        {
+          "astId": 3,
+          "contract": "src/slots.sol:slots",
+          "label": "xint1",
+          "offset": 0,
+          "slot": "0",
+          "type": "t_uint8"
+        },
+        {
+          "astId": 5,
+          "contract": "src/slots.sol:slots",
+          "label": "xint2",
+          "offset": 1,
+          "slot": "0",
+          "type": "t_uint8"
+        },
+        {
+          "astId": 7,
+          "contract": "src/slots.sol:slots",
+          "label": "bool1",
+          "offset": 2,
+          "slot": "0",
+          "type": "t_bool"
+        }
+      ]
+    },
+    "t_uint8": {
+      "encoding": "inplace",
+      "label": "uint8",
+      "numberOfBytes": "1"
+    }
+  }
+}
