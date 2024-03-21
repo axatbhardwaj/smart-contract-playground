@@ -4,11 +4,11 @@ pragma solidity ^0.8;
 // import {ERC1155} from "lib/openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
 
 error NotFaculty(address);
-error NoresultorNotAuthorized(address);
+error NotAuthorized(address);
 
 contract CertificateStore {
 
-constructor(string memory uri_,address _faculty , address _admin) {
+constructor(address _faculty , address _admin) {
     faculty = _faculty;
     admin = _admin;
     }
@@ -17,14 +17,15 @@ constructor(string memory uri_,address _faculty , address _admin) {
     address faculty ;
     address admin ;
 
+    uint256 certificateCount ;
 
     struct certDetails{
         // address student;
         string certificateUrl;
-        string certificateID;
+        uint256 certificateID;
     }
 
-    mapping (address => certDetails) public certBook;
+    mapping (address => certDetails) internal certBook;
 
     modifier onlyFaculty {
         
@@ -36,30 +37,34 @@ constructor(string memory uri_,address _faculty , address _admin) {
     }    
 
     modifier onlyAdmin {
-           if(msg.sender == admin)
+           if(msg.sender != admin)
         {
-            revert NotFaculty(msg.sender);
+            revert NotAuthorized(msg.sender);
         }
         _;
     }
 
-    modifier onlyStudent {
-        if (certBook[msg.sender] == 0 ) {
-            revert NoresultorNotAuthorized(msg.sender);
-        }
-        _;
+    function uploadCertificate(string calldata _certUrl , address _student) public onlyFaculty { 
+        certificateCount++;
+
+        certBook[_student]=certDetails({
+            certificateID: certificateCount,
+           certificateUrl : _certUrl
+        });
+
     }
 
-    function mintCertificate(string calldata _certUrl , address _student , string calldata _certificateId) public onlyFaculty returns(uint256){ 
+    function deleteCertificate(address _student) public onlyAdmin {
         
+        certificateCount--;
+
+        certBook[_student].certificateID=0;
+        certBook[_student].certificateUrl="DELETED BY ADMIN";
+
     }
 
-    function deleteCertificate() public onlyAdmin returns(bool){
-
-    }
-
-    function viewCertificate () public onlyStudent returns (string){
-
+    function viewCertificate () public view returns (certDetails memory ){
+        return certBook[msg.sender];
     }
 
 }
