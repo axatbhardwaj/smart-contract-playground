@@ -7,3 +7,6 @@
 [submodule "certificate-store/lib/openzeppelin-contracts"]
 	path = certificate-store/lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "chain-link-functions/lib/forge-std"]
+	path = chain-link-functions/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
