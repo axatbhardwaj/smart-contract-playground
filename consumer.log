@@ -1,0 +1,9 @@
+❯ forge create AnimeConsumer --rpc-url $RPC_BASE_SEPOLIA --private-key $KEY_PERS_DEV --constructor-args "0xf9B8fc078197181C841c296
+C876945aaa425B278"
+[⠊] Compiling...
+No files changed, compilation skipped
+Deployer: 0x980abF154694Fe3Fea424eD095B04C6365E92F9b
+Deployed to: 0x22a724735F49959177F638940Db92C896cD183F5
+Transaction hash: 0xae338e4d74f2fead1d13b1b5f59c55b89a8e2c517fc582b8830319b4c665c07b
+
+forge v 0x22a724735F49959177F638940Db92C896cD183F5 --rpc-url $RPC_BASE_SEPOLIA AnimeConsumer --verifier blockscout --verifier-url https://base-sepolia.blockscout.com/api/

@@ -15,6 +15,14 @@ contract AnimeConsumer is FunctionsClient, ConfirmedOwner {
     string public s_lastCharacter;
     string public s_lastAnime;
 
+    bytes32 donID =
+        0x66756e2d626173652d7365706f6c69612d310000000000000000000000000000;
+
+    uint64 subscriptionId = 216;
+
+    // Callback gas limit
+    uint32 gasLimit = 300000;
+
     error UnexpectedRequestID(bytes32 requestId);
 
     event Response(bytes32 indexed requestId, bytes response, bytes err);
@@ -25,49 +33,21 @@ contract AnimeConsumer is FunctionsClient, ConfirmedOwner {
 
     string source =
         "const apiResponse = await Functions.makeHttpRequest({"
-        "  url: `https://animechan.io/api/v1/quotes/random`"
+        "  url: 'https://animechan.io/api/v1/quotes/random'"
         "});"
         "if (apiResponse.error) {"
         "  console.error(apiResponse.error);"
         "  throw Error('Request failed');"
         "}"
-        "const { data } = apiResponse;"
+        "const data = apiResponse.data.data;"
         "const quote = data.content;"
         "const anime = data.anime.name;"
         "const character = data.character.name;"
-        "return Functions.encodeString(quote + ' - ' + character + ' (' + anime + ')');";
+        "return Functions.encodeString(JSON.stringify({ quote, anime, character }));";
 
-    /**
-     * @notice Send a simple request
-     * @param encryptedSecretsUrls Encrypted URLs where to fetch user secrets
-     * @param donHostedSecretsSlotID Don hosted secrets slotId
-     * @param donHostedSecretsVersion Don hosted secrets version
-     * @param args List of arguments accessible from within the source code
-     * @param bytesArgs Array of bytes arguments, represented as hex strings
-     * @param subscriptionId Billing ID
-     */
-    function sendRequest(
-        bytes memory encryptedSecretsUrls,
-        uint8 donHostedSecretsSlotID,
-        uint64 donHostedSecretsVersion,
-        string[] memory args,
-        bytes[] memory bytesArgs,
-        uint64 subscriptionId,
-        uint32 gasLimit,
-        bytes32 donID
-    ) external onlyOwner returns (bytes32 requestId) {
+    function sendRequest() external onlyOwner returns (bytes32 requestId) {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(source);
-        if (encryptedSecretsUrls.length > 0)
-            req.addSecretsReference(encryptedSecretsUrls);
-        else if (donHostedSecretsVersion > 0) {
-            req.addDONHostedSecrets(
-                donHostedSecretsSlotID,
-                donHostedSecretsVersion
-            );
-        }
-        if (args.length > 0) req.setArgs(args);
-        if (bytesArgs.length > 0) req.setBytesArgs(bytesArgs);
         s_lastRequestId = _sendRequest(
             req.encodeCBOR(),
             subscriptionId,
@@ -93,17 +73,11 @@ contract AnimeConsumer is FunctionsClient, ConfirmedOwner {
             revert UnexpectedRequestID(requestId);
         }
 
-        // Assuming the response is encoded as (string, string, string)
-        (
-            string memory quote,
-            string memory character,
-            string memory anime
-        ) = abi.decode(response, (string, string, string));
+        // Destructure the response data
+        string memory quote = abi.decode(response, (string));
 
         // Save the destructured response to state variables
         s_lastQuote = quote;
-        s_lastCharacter = character;
-        s_lastAnime = anime;
 
         s_lastError = err;
         emit Response(requestId, s_lastResponse, s_lastError);
